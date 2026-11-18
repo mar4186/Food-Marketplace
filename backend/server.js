@@ -1,12 +1,11 @@
-import cors from "cors";
-import express from "express";
-import dotenv from "dotenv";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import mysql from "mysql2";
-import crypto from "crypto";
+import cors from 'cors'
+import express from 'express';
 
 const app = express();
+
+import authRoute from './routes/authRoutes.js';
+
+app.use('/api/auth', authRoute);
 
 app.use(express.json());
 app.use(cors());

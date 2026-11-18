@@ -4,6 +4,8 @@ import '../styles/Register.css';
 
 function Register(){
 
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -21,6 +23,26 @@ function Register(){
                 </div>
 
                 <form className='register-form' onSubmit={handleRegistration}>
+                    <label htmlFor="first-name-input">First Name</label>
+                    <input
+                        id="first-name-input"
+                        type="text"
+                        required
+                        placeholder="Enter first name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                    ></input>
+
+                    <label htmlFor="last-name-input">Last Name</label>
+                    <input
+                        id="last-name-input"
+                        type="text"
+                        required
+                        placeholder="Enter last name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                    ></input>
+
                     <label htmlFor="email-input">Email</label>
                     <input
                         id="email-input"
@@ -51,7 +73,7 @@ function Register(){
                         onChange={(e) => setPassword(e.target.value)}
                     ></input>
 
-                    <button className="button" type="submit">Log In</button>
+                    <button className="button" type="submit">Register account</button>
                 </form>
 
                 <Link to='/' className="button">Back to Login</Link>

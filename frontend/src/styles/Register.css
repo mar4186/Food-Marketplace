@@ -31,6 +31,14 @@
     gap: 5px;
 }
 
+#first-name-input{
+    margin-bottom: 20px;
+}
+
+#last-name-input{
+    margin-bottom: 20px;
+}
+
 #email-input{
     margin-bottom: 20px;
 }
