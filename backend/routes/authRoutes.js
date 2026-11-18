@@ -1,7 +1,6 @@
 import express from 'express';
 import db from './config/db.js';
 import bcrypt from "bcrypt";
-import mysql from "mysql2";
 import crypto from "crypto";
 
 const router = express.Router();
@@ -13,7 +12,7 @@ router.get('/', (req, res) => {
 router.post('/login', (req, res) => {
     try{
         const username = req.body.username;
-        const password = req.body.passsword;
+        const password = req.body.password;
 
         const sql = 'SELECT * FROM users WHERE username = ?';
 
@@ -53,7 +52,7 @@ router.post('/register', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const sql = 'INSERT INTO users (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?)'
+        const sql = 'INSERT INTO users (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?)';
 
         const values = [firstName, lastName, email, username, hashedPassword];
 
