@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
 
-    const token = authHeader && authHeader.split('')[1];
+    const token = authHeader && authHeader.split(' ')[1];
 
     if(!token){
         return res.status(401).json({ message: 'Access token required' });
@@ -20,3 +20,5 @@ const verifyToken = (req, res, next) => {
         next();
     });
 }
+
+export default verifyToken;

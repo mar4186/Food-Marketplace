@@ -42,7 +42,7 @@ function Login(){
                 JSON.stringify(res.data.user)
             );
 
-            navigate('/App');
+            navigate('/dashboard');
         }
         catch(err: any){
             console.error('Login failed:', err);

@@ -3,17 +3,44 @@ import db from '../config/db.js';
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import verifyToken from '../middleware/authMiddleware.js';
 
 dotenv.config();
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.status(200).json({ message: "Hi!" })
+// Retrieve user's name
+
+router.get('/me', verifyToken, (req, res) => {
+    try{
+        const userId = req.user.user_id;
+
+        const sql = 'SELECT first_name FROM users WHERE user_id = ?';
+
+        db.query(sql, [userId], (err, data) => {
+            if(err){
+                console.error(err);
+                return res.status(500).json({ message: 'Database error'});
+            }
+
+            if(data.length === 0){
+                return res.status(404).json({ message: 'User not found'});
+            }
+
+            res.status(200).json({
+                firstName: data[0].first_name
+            })
+        })
+
+    }
+    catch(err){
+        console.error('Database error: ', err);
+        res.status(500).json({ message: 'Unable to retrieve name'});
+    }
 })
 
 // login validation
 
-router.post('/login', async (req, res) => {
+router.post('/login', (req, res) => {
     try{
         const username = req.body.username;
         const password = req.body.password;
@@ -76,26 +103,50 @@ router.post('/register', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const sql = 'INSERT INTO users (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?)';
+        const profileQuery = 'INSERT INTO users (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?)';
 
-        const values = [firstName, lastName, email, username, hashedPassword];
+        const registerValues = [firstName, lastName, email, username, hashedPassword];
 
-        db.query(sql, values, (err, result) => {
+        db.query(profileQuery, registerValues, (err, result) => {
             if(err){
                 console.error('Database error:', err);
-                return res.status(500).json({ message: 'Unable to process registration'});
+                return res.status(500).json({ message: 'Unable to process user registration'});
             }
 
-            res.status(201).json({ 
-            message: 'User registered and created',
-            userId: result.insertId
-            });
+            const walletQuery = 'INSERT INTO wallets (user_id, balance) VALUES (?, ?)';
+
+            const newUserId = result.insertId;
+            const initialBalance = 0.00;
+
+           const walletValues = [newUserId, initialBalance];
+
+            db.query(walletQuery, walletValues, (err, walletResult) => {
+               if(err){
+                    console.error('Database error:', err);
+                    return res.status(500).json({ message: 'Unable to process wallet registration'});
+                }
+
+                res.status(201).json({
+                    message: 'User and wallet created',
+                    userId: newUserId,
+                    walletId: walletResult.insertId
+                });
+            })
         })
     }
     catch(err){
         console.error('Registration error: ', err);
         res.status(500).json({ message: 'Unable to process registration'});
     }
+})
+
+// Protected route
+
+router.get('/protected', (req, res) => {
+    res.json({
+        message: 'You accessed a protected route!',
+        user: req.user
+    })
 })
 
 export default router;
