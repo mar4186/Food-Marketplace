@@ -23,21 +23,27 @@ function Register(){
 
         if(!firstName){
             setRegisterError('First name is required');
+            return;
         }
         if(!lastName){
             setRegisterError('First name is required');
+            return;
         }
         if(!email.trim()){
             setRegisterError('Email is required');
+            return;
         }
         if(!username){
             setRegisterError('Username is required');
+            return;
         }
         if(!password){
             setRegisterError('Password is required');
+            return;
         }
         else if(password.length < 8){
             setRegisterError('Password must be at least 8 characters');
+            return;
         }
 
         try{
@@ -113,7 +119,7 @@ function Register(){
                     <input
                         id="password-input"
                         type="password"
-                        placeholder="Enter username"
+                        placeholder="Enter password"
                         value={password}                            
                         onChange={(e) => setPassword(e.target.value)}
                     ></input>
