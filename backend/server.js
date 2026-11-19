@@ -3,12 +3,12 @@ import express from 'express';
 
 const app = express();
 
+app.use(express.json());
+app.use(cors({origin: 'http://localhost:5173'}));
+
 import authRoute from './routes/authRoutes.js';
 
 app.use('/api/auth', authRoute);
-
-app.use(express.json());
-app.use(cors());
 
 // Server
 

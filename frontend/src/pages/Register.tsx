@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import '../styles/Register.css';
+import axios from 'axios';
 
 function Register(){
 
@@ -9,9 +10,55 @@ function Register(){
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [registerError, setRegisterError] = useState('');
+    const [registerSuccess, setRegisterSuccess] = useState('');
+
+    const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleRegistration = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        setRegisterError('');
+
+        if(!firstName){
+            setRegisterError('First name is required');
+        }
+        if(!lastName){
+            setRegisterError('First name is required');
+        }
+        if(!email.trim()){
+            setRegisterError('Email is required');
+        }
+        if(!username){
+            setRegisterError('Username is required');
+        }
+        if(!password){
+            setRegisterError('Password is required');
+        }
+        else if(password.length < 8){
+            setRegisterError('Password must be at least 8 characters');
+        }
+
+        try{
+            const res = await axios.post(`${API_URL}/auth/register`, {firstName, lastName, email, username, password})
+
+            console.log(res.data);
+
+            setRegisterSuccess('Registered successfully!')
+
+            setTimeout(() => {navigate('/');}, 3000);
+        }
+        catch(err: any){
+            console.error('Registration failed:', err);
+
+            if(err.response?.status === 401){
+                setRegisterError('Invalid input. Please try again');
+            }
+            else{
+                setRegisterError('Something went wrong. Try again');
+            }
+        }
     }
 
     return(
@@ -20,6 +67,9 @@ function Register(){
                 <div className='register-header'>
                     <h1>Register</h1>
                     <p>Enter your details below to create your account</p>
+
+                    {registerError && (<p className='error-message'>{registerError}</p>)}
+                    {registerSuccess && (<p className='success-message'>{registerSuccess}</p>)}
                 </div>
 
                 <form className='register-form' onSubmit={handleRegistration}>
@@ -27,7 +77,6 @@ function Register(){
                     <input
                         id="first-name-input"
                         type="text"
-                        required
                         placeholder="Enter first name"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
@@ -37,7 +86,6 @@ function Register(){
                     <input
                         id="last-name-input"
                         type="text"
-                        required
                         placeholder="Enter last name"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
@@ -47,7 +95,6 @@ function Register(){
                     <input
                         id="email-input"
                         type="email"
-                        required
                         placeholder="Enter email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -57,8 +104,7 @@ function Register(){
                     <input
                         id="username-input"
                         type="text"
-                        required
-                        placeholder="Enter username"
+                        placeholder="Enter a username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                     ></input>
@@ -67,7 +113,6 @@ function Register(){
                     <input
                         id="password-input"
                         type="password"
-                        required
                         placeholder="Enter username"
                         value={password}                            
                         onChange={(e) => setPassword(e.target.value)}

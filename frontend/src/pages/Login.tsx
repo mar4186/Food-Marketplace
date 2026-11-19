@@ -1,15 +1,59 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 import { useState } from 'react';
-import axios from 'react';
+import axios from 'axios';
 
 function Login(){
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loginError, setLoginError] = useState('');
+
+    const navigate = useNavigate();
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleLogin = async(e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        setLoginError('');
+
+        if(!username){
+            setLoginError('Username is required');
+            return;
+        }
+        
+        if(!password){
+            setLoginError('Password is required');
+            return;
+        }
+
+        try{
+            const res = await axios.post(`${API_URL}/auth/login`, { username, password });
+
+            const token = res.data.accessToken;
+
+            sessionStorage.setItem(
+                'accessToken',
+                token
+            );
+
+            sessionStorage.setItem(
+                'user',
+                JSON.stringify(res.data.user)
+            );
+
+            navigate('/App');
+        }
+        catch(err: any){
+            console.error('Login failed:', err);
+            
+            if(err.response?.status === 401){
+                setLoginError('Invalid email or password');
+            }
+            else{
+                setLoginError('Something went wrong. Try again');
+            }
+        }
     }
 
     return(
@@ -18,6 +62,8 @@ function Login(){
                 <div className="login-header">
                     <h1>Foodland</h1>
                     <p>Welcome! Enter your username and password</p>
+
+                    {loginError && (<p className='error-message'>{loginError}</p>)}
                 </div>
 
                 <div className="login-form">
@@ -26,7 +72,6 @@ function Login(){
                         <input
                             id="username-input"
                             type="text"
-                            required
                             placeholder="Enter username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
@@ -36,7 +81,6 @@ function Login(){
                         <input
                             id="password-input"
                             type="password"
-                            required
                             placeholder="Enter username"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}

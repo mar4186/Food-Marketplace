@@ -39,6 +39,10 @@
     margin-bottom: 20px;
 }
 
+.error-message{
+    color: hsl(0, 100%, 50%);
+}
+
 
 .button{
     padding: 20px;

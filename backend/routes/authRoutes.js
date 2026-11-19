@@ -1,15 +1,19 @@
 import express from 'express';
-import db from './config/db.js';
+import db from '../config/db.js';
 import bcrypt from "bcrypt";
-import crypto from "crypto";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const router = express.Router();
 
 router.get('/', (req, res) => {
     res.status(200).json({ message: "Hi!" })
 })
 
-router.post('/login', (req, res) => {
+// login validation
+
+router.post('/login', async (req, res) => {
     try{
         const username = req.body.username;
         const password = req.body.password;
@@ -35,14 +39,34 @@ router.post('/login', (req, res) => {
                 return res.status(401).json({ message: 'Invalid username or password'});
             }
 
-            res.status(200).json({ message: 'Login successful' });
+            const accessToken = jwt.sign({
+                user_id: user.user_id,
+                email: user.email
+            }, 
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+                expiresIn: "1h",
+            });
+
+            res.status(200).json({ 
+                message: 'Login successful',
+                accessToken: accessToken,
+                user: {
+                    user_id: user.user_id,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    email: user.email,
+                },
+            });
         })
     }
     catch(err){
-        console.error('Registration error: ', err);
+        console.error('Login error: ', err);
         res.status(500).json({ message: 'Unable to process login'});
     }
 })
+
+// Register account
 
 router.post('/register', async (req, res) => {
     try{
@@ -56,12 +80,17 @@ router.post('/register', async (req, res) => {
 
         const values = [firstName, lastName, email, username, hashedPassword];
 
-        const result = await db.query(sql, values);
+        db.query(sql, values, (err, result) => {
+            if(err){
+                console.error('Database error:', err);
+                return res.status(500).json({ message: 'Unable to process registration'});
+            }
 
-        res.status(201).json({ 
+            res.status(201).json({ 
             message: 'User registered and created',
             userId: result.insertId
-        });
+            });
+        })
     }
     catch(err){
         console.error('Registration error: ', err);
