@@ -17,16 +17,6 @@ function Login(){
 
         setLoginError('');
 
-        if(!username){
-            setLoginError('Username is required');
-            return;
-        }
-        
-        if(!password){
-            setLoginError('Password is required');
-            return;
-        }
-
         try{
             const res = await axios.post(`${API_URL}/auth/login`, { username, password });
 
@@ -47,12 +37,7 @@ function Login(){
         catch(err: any){
             console.error('Login failed:', err);
             
-            if(err.response?.status === 401){
-                setLoginError('Invalid email or password');
-            }
-            else{
-                setLoginError('Something went wrong. Try again');
-            }
+            setLoginError(err.response?.data?.message || 'Something went wrong. Try again');
         }
     }
 

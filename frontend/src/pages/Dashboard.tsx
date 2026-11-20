@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
+import '../styles/Dashboard.css';
 
 function Dashboard(){
 
@@ -24,8 +25,10 @@ function Dashboard(){
     }, []);
 
     return(
-        <div className='header'>
-            <h1>Welcome {firstName}!</h1>
+        <div className='dashboard-page'>
+            <div className='header'>
+                <h1>Welcome {firstName}!</h1>
+            </div>
         </div>
     )
 }

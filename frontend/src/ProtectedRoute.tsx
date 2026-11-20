@@ -26,7 +26,7 @@ function ProtectedRoute({ children }: Props){
             }
 
             try{
-                await axios.get(`${API_URL}/auth/login`, { headers: { Authorization: `Bearer ${token}`}});
+                await axios.get(`${API_URL}/auth/protected`, { headers: { Authorization: `Bearer ${token}`}});
 
                 if(active){
                     setAuthenticated(true);

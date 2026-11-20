@@ -21,49 +21,19 @@ function Register(){
 
         setRegisterError('');
 
-        if(!firstName){
-            setRegisterError('First name is required');
-            return;
-        }
-        if(!lastName){
-            setRegisterError('First name is required');
-            return;
-        }
-        if(!email.trim()){
-            setRegisterError('Email is required');
-            return;
-        }
-        if(!username){
-            setRegisterError('Username is required');
-            return;
-        }
-        if(!password){
-            setRegisterError('Password is required');
-            return;
-        }
-        else if(password.length < 8){
-            setRegisterError('Password must be at least 8 characters');
-            return;
-        }
-
         try{
             const res = await axios.post(`${API_URL}/auth/register`, {firstName, lastName, email, username, password})
 
             console.log(res.data);
 
-            setRegisterSuccess('Registered successfully!')
+            setRegisterSuccess(res.data.message);
 
             setTimeout(() => {navigate('/');}, 3000);
         }
         catch(err: any){
             console.error('Registration failed:', err);
 
-            if(err.response?.status === 401){
-                setRegisterError('Invalid input. Please try again');
-            }
-            else{
-                setRegisterError('Something went wrong. Try again');
-            }
+            setRegisterError(err.response?.data?.message || 'Something went wrong. Try again');
         }
     }
 
